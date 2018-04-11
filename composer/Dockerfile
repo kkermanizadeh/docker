@@ -34,6 +34,10 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get update && \
                        nasm  \
                        libpng-dev\
                        libwebp-dev \
+                       python \
+                       python-dev \
+                       python-pip \
+                       python-virtualenv \
                        && \
      rm -rf /var/lib/apt/lists/*
 
@@ -61,3 +65,21 @@ ENV NODE_PATH $NVM_DIR/v$NODE_VERSION/lib/node_modules
 
 # Set the path.
 ENV PATH      $NVM_DIR/v$NODE_VERSION/bin:$PATH
+
+#Create a defule user: composer
+RUN useradd -p $(openssl passwd -1 'composer') -m -d /home/composer \
+            -s /bin/bash -g root 'composer'
+
+RUN groupadd -g 500 node
+
+RUN usermod -a -G sudo,node composer
+RUN echo "source /usr/local/.nvm/nvm.sh" > /home/composer/.bashrc && \
+    source /home/composer/.bashrc
+
+#Login as composer
+RUN su - composer
+
+#RUN npm install -g composer-cli
+#RUN mkdir ~/HyperledgerComposer
+#RUN export COMPOSER_ROOT=~/HyperledgerComposer
+
